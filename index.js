@@ -50,7 +50,8 @@ module.exports = function (config) {
         
     optimizer.addFile({
       source: file.contents.toString(),
-      path: file.path
+      path: file.path,
+      name: file.path
     });
     
   }

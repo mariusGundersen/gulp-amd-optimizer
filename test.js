@@ -3,23 +3,110 @@ var assert = require('assert');
 var gutil = require('gulp-util');
 var amdOptimize = require('./index');
 var path = require('path');
+var fs = require('fs');
+
+
+function configInputOutputDone(config, input, output, done){
+  
+  var stream = amdOptimize(config);
+  
+  stream.on('data', function(file){
+    
+    var expected = output.shift();
+    
+    assert.equal(file.path, expected.path);
+    assert.equal(file.contents.toString(), expected.contents);
+  });
+  
+  stream.on('end', done);
+  
+  
+  input.forEach(function(file){
+    stream.write(new gutil.File({
+      path: file.path,
+      contents: new Buffer(file.contents)
+    }));
+  });
+  
+  stream.end();
+}
+
+
+
 
 it('should emit a named module without dependencies unchanged', function(done){
   
-  var stream = amdOptimize({
+  configInputOutputDone({
     baseUrl: __dirname
-  });
+  }, [
+    {
+      path: 'myModule.js',
+      contents: 'define("myModule", function(){ return "test"; })'
+    }
+  ], [
+    {
+      path: 'myModule',
+      contents: 'define("myModule", function(){ return "test"; })'
+    }
+  ], done);
+});
+
+
+it('should emit a named anonymous modules', function(done){
   
-  stream.on('data', function(file){
-    assert.equal(file.path, 'myModule');
-    assert.equal(file.contents.toString(), 'define("myModule", function(){ return "test"; })');
-    done();
-  });
+  configInputOutputDone({
+    baseUrl: __dirname
+  }, [
+    {
+      path: 'myModule.js',
+      contents: 'define(function(){ return "test"; })'
+    }
+  ], [
+    {
+      path: 'myModule',
+      contents: 'define("myModule", function(){ return "test"; })'
+    }
+  ], done);
+});
+
+it('should emit a dependency', function(done){
   
-  stream.write(new gutil.File({
-    path: 'myModule.js',
-    contents: new Buffer('define("myModule", function(){ return "test"; })')
-  }));
+  configInputOutputDone({
+    baseUrl: __dirname
+  }, [
+    {
+      path: 'myModule.js',
+      contents: 'define(["deps/dep1"], function(){ return "test"; })'
+    }
+  ], [
+    {
+      path: 'deps/dep1',
+      contents: 'define("deps/dep1", function(){return "dependency1";});'
+    },
+    {
+      path: 'myModule',
+      contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; })'
+    }
+  ], done);
+});
+
+it('should emit one file per module', function(done){
   
-  stream.end();
+  configInputOutputDone({
+    baseUrl: __dirname
+  }, [
+    {
+      path: 'myModule.js',
+      contents: 'define(["dep1"], function(){ return "test"; }); define("dep1", function(){return "dependency1";});'
+    }
+  ], [
+    {
+      path: 'dep1',
+      contents: 'define("dep1", function(){return "dependency1";});'
+    },
+    {
+      path: 'myModule',
+      contents: 'define("myModule", ["dep1"], function(){ return "test"; })'
+    }
+  ], done);
 });
