@@ -1,0 +1,32 @@
+{
+  "name": "gulp-amd-optimize",
+  "version": "0.0.1",
+  "description": "Emits the entire dependency tree of one or more AMD modules, from leaves to root, and names anonymous modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mariusGundersen/gulp-amd-optimize"
+  },
+  "keywords": [
+    "gulpplugin",
+    "amd",
+    "optimize",
+    "require"
+  ],
+  "author": "Marius Gundersen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mariusGundersen/gulp-amd-optimize/issues"
+  },
+  "homepage": "https://github.com/mariusGundersen/gulp-amd-optimize",
+  "dependencies": {
+    "through2": "^0.4.1",
+    "gulp-util": "^2.2.14"
+  },
+  "devDependencies": {
+    "mocha": "^1.18.2"
+  }
+}
