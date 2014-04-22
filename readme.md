@@ -21,7 +21,7 @@ var concat = require('gulp-concat');
 gulp.task('default', function () {
   return gulp.src('src/*.css')
     .pipe(amdOptimize())
-    .pipe(concat())
+    .pipe(concat('modules.js'))
     .pipe(gulp.dest('dist'));
 });
 ```
@@ -50,7 +50,7 @@ gulp.task('default', function () {
         'jQuery': 'bower_components/jQuery/jQuery'
       }
     }))
-    .pipe(concat())
+    .pipe(concat('modules.js'))
     .pipe(gulp.dest('dist'));
 });
 ```

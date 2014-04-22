@@ -24,7 +24,9 @@
   "homepage": "https://github.com/mariusGundersen/gulp-amd-optimize",
   "dependencies": {
     "through2": "^0.4.1",
-    "gulp-util": "^2.2.14"
+    "gulp-util": "^2.2.14",
+    "amd-optimize": "0.0.2",
+    "through": "^2.3.4"
   },
   "devDependencies": {
     "mocha": "^1.18.2"
