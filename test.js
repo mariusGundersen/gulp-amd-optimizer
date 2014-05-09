@@ -106,7 +106,7 @@ it('should emit one file per module', function(done){
     },
     {
       path: 'myModule',
-      contents: 'define("myModule", ["dep1"], function(){ return "test"; })'
+      contents: 'define("myModule", ["dep1"], function(){ return "test"; });'
     }
   ], done);
 });
