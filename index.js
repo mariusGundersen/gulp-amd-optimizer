@@ -1,5 +1,5 @@
 'use strict';
-var optimize = require('../amd-optimize');
+var optimize = require('amd-optimizer');
 var gutil = require('gulp-util');
 var through = require('through');
 var fs = require('fs');
