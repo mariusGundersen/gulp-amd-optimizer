@@ -42,6 +42,8 @@ module.exports = function (config) {
     throw new PluginError('gulp-amd-optimize', 'baseUrl is required in the config');
   }
   
+  var sourceMapSupport = false;
+  var cwd;
   
   var optimizer = optimize(config);
 
@@ -56,11 +58,19 @@ module.exports = function (config) {
     if (file.isNull()) {
       this.push(file);
     }
+    
+    if(file.sourceMap){
+      sourceMapSupport = true;
+    }
 
     if (file.isStream()) {
       this.emit('error', new PluginError('gulp-amd-optimize', 'Streaming not supported'));
       return
     }
+    
+    console.log(file.path, file.base, file.cwd);
+    
+    cwd = file.cwd;
     
     optimizer.addFile({
       source: file.contents.toString(),
@@ -83,12 +93,18 @@ module.exports = function (config) {
         return;
       }
       
-      this.queue(new File({
-        cwd: config.baseUrl,
-        base: 'something',
-        path: module.name,
+      var file = new File({
+        path: cwd+'/'+config.baseUrl + module.name + '.js',
+        base: cwd+'/'+config.baseUrl,
+        cwd: cwd,
         contents: new Buffer(module.code)
-      }));
+      });
+      
+      if(sourceMapSupport){
+        file.sourceMap = (module.map);
+      }
+      
+      this.queue(file);
     }.bind(this));
     
     this.queue(null);

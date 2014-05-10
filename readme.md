@@ -1,4 +1,4 @@
-# [gulp](https://github.com/wearefractal/gulp)-amd-optimize 
+# [gulp](https://github.com/wearefractal/gulp)-amd-optimizer
 
 > Emits the entire dependency tree of one or more AMD modules, from leaves to root, and names anonymous modules
 
@@ -7,7 +7,7 @@ This module does not combine the modules into a single file. It is up to you to 
 ## Install
 
 ```bash
-$ npm install --save-dev gulp-amd-optimize
+$ npm install --save-dev gulp-amd-optimizer
 ```
 
 
@@ -15,11 +15,11 @@ $ npm install --save-dev gulp-amd-optimize
 
 ```js
 var gulp = require('gulp');
-var amdOptimize = require('gulp-amd-optimize');
+var amdOptimize = require('gulp-amd-optimizer');
 var concat = require('gulp-concat');
 
 gulp.task('default', function () {
-  return gulp.src('src/*.css')
+  return gulp.src('src/*.js')
     .pipe(amdOptimize())
     .pipe(concat('modules.js'))
     .pipe(gulp.dest('dist'));
@@ -28,29 +28,42 @@ gulp.task('default', function () {
 
 ### Output
 
-gulp-amd-optimize accepts JS files containing one or more AMD modules. Anonymous modules are given the name of the file (including the path, relative to the baseUrl, without the `.js` extension). Dependencies of modules are found and a full dependency tree is constructed. Finally the tree is sorted in topological order (from leaves to root nodes) and each module is emitted as a single file.
+gulp-amd-optimizer accepts JS files containing one or more AMD modules. Anonymous modules are given the name of the file (including the path, relative to the baseUrl, without the `.js` extension). Dependencies of modules are found and a full dependency tree is constructed. Finally the tree is sorted in topological order (from leaves to root nodes) and each module is emitted as a single file.
 
 This plugin does not attempt to concat the files. This is the job of other plugins.
 
 
 ### Options
 
-The method takes the requireJS config file as its first argument. Use this to supply the baseUrl, path and other requireJS configurations
+The method takes the requireJS config file as its first argument. Use this to supply the baseUrl, path and other requireJS configurations. You can also supply a list of modules or paths to exclude from the built file. This is useful when you depend on other libraries, like jQuery. 
+
+### Sourcemap
+
+gulp-amd-optimzer supports the [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps/) plugin. The example below shows how sourcemaps can be used along with the options 
 
 ```js
 var gulp = require('gulp');
-var amdOptimize = require('gulp-amd-optimize');
-var concat = require('gulp-concat');
+var amdOptimize = require('gulp-amd-optimizer');
+var concat = require('gulp-concat-sourcemap');
+var sourcemap = require('gulp-sourcemaps');
 
 gulp.task('default', function () {
-  return gulp.src('src/*.css')
-    .pipe(amdOptimize({
-      baseUrl: __dirname,
-      path: {
-        'jQuery': 'bower_components/jQuery/jQuery'
-      }
-    }))
-    .pipe(concat('modules.js'))
+  return gulp.src('src/*.js')
+    .pipe(sourcemap.init())
+      .pipe(amdOptimize({
+        baseUrl: 'src',
+        path:{
+          'lib': '../lib'
+        }
+        exclude: [
+          'jQuery'
+        ]
+      }))
+      .pipe(concat('modules.js', {
+        sourcesContent: true,
+        prefix: 1
+      }))
+    .pipe(sourcemap.write())
     .pipe(gulp.dest('dist'));
 });
 ```
