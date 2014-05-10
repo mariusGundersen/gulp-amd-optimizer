@@ -46,7 +46,7 @@ it('should emit a named module without dependencies unchanged', function(done){
   ], [
     {
       path: 'myModule',
-      contents: 'define("myModule", function(){ return "test"; })'
+      contents: 'define("myModule", function(){ return "test"; });'
     }
   ], done);
 });
@@ -64,7 +64,7 @@ it('should emit a named anonymous modules', function(done){
   ], [
     {
       path: 'myModule',
-      contents: 'define("myModule", function(){ return "test"; })'
+      contents: 'define("myModule", function(){ return "test"; });'
     }
   ], done);
 });
@@ -85,7 +85,7 @@ it('should emit a dependency', function(done){
     },
     {
       path: 'myModule',
-      contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; })'
+      contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; });'
     }
   ], done);
 });
