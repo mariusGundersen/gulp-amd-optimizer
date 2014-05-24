@@ -15,7 +15,7 @@ function loadFile(path, name){
   return {
     name: name,
     path: path,
-    source: fs.readFileSync(path)
+    source: fs.readFileSync(path).toString('utf8')
   };
 }
 
@@ -68,12 +68,10 @@ module.exports = function (config) {
       return
     }
     
-    console.log(file.path, file.base, file.cwd);
-    
     cwd = file.cwd;
     
     optimizer.addFile({
-      source: file.contents.toString(),
+      source: file.contents.toString('utf8'),
       path: file.path,
       name: baseName.exec(file.relative.replace(windowsBackslash, "/"))[1]
     });
@@ -97,11 +95,13 @@ module.exports = function (config) {
         path: cwd+'/'+config.baseUrl + module.name + '.js',
         base: cwd+'/'+config.baseUrl,
         cwd: cwd,
-        contents: new Buffer(module.code)
+        contents: new Buffer(module.code+'\n\n')
       });
       
       if(sourceMapSupport){
-        file.sourceMap = (module.map);
+        module.map.sourcesContent = [module.source];
+        
+        file.sourceMap = module.map;
       }
       
       this.queue(file);

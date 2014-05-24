@@ -16,7 +16,7 @@ $ npm install --save-dev gulp-amd-optimizer
 ```js
 var gulp = require('gulp');
 var amdOptimize = require('gulp-amd-optimizer');
-var concat = require('gulp-concat');
+var concat = require('gulp-concat-sourcemap');
 
 gulp.task('default', function () {
   return gulp.src('src/*.js')
