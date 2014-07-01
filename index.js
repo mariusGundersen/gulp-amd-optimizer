@@ -3,6 +3,7 @@ var optimize = require('amd-optimizer');
 var gutil = require('gulp-util');
 var through = require('through');
 var fs = require('fs');
+var path = require('path');
 
 var File = gutil.File;
 var Buffer = require('buffer').Buffer;
@@ -36,16 +37,18 @@ function isExcluded(config, name){
 
 
 
-module.exports = function (config) {
+module.exports = function (config, options) {
   
   if(config == undefined || 'baseUrl' in config == false){
     throw new PluginError('gulp-amd-optimize', 'baseUrl is required in the config');
   }
   
+  options = options || {};
+  
   var sourceMapSupport = false;
   var cwd;
   
-  var optimizer = optimize(config);
+  var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
     if(isExcluded(config, dependency.name)){
@@ -92,8 +95,8 @@ module.exports = function (config) {
       }
       
       var file = new File({
-        path: cwd+'/'+config.baseUrl + module.name + '.js',
-        base: cwd+'/'+config.baseUrl,
+        path: module.name,
+        base: path.join(cwd, config.baseUrl),
         cwd: cwd,
         contents: new Buffer(module.code+'\n\n')
       });

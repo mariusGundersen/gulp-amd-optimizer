@@ -1,7 +1,7 @@
 'use strict';
 var assert = require('assert');
 var gutil = require('gulp-util');
-var amdOptimize = require('./index');
+var amdOptimize = require('../index');
 var path = require('path');
 var fs = require('fs');
 
@@ -37,7 +37,7 @@ function configInputOutputDone(config, input, output, done){
 it('should emit a named module without dependencies unchanged', function(done){
   
   configInputOutputDone({
-    baseUrl: __dirname
+    baseUrl: '.'
   }, [
     {
       path: 'myModule.js',
@@ -46,7 +46,7 @@ it('should emit a named module without dependencies unchanged', function(done){
   ], [
     {
       path: 'myModule',
-      contents: 'define("myModule", function(){ return "test"; });'
+      contents: 'define("myModule", function(){ return "test"; });\n\n'
     }
   ], done);
 });
@@ -64,7 +64,7 @@ it('should emit a named anonymous modules', function(done){
   ], [
     {
       path: 'myModule',
-      contents: 'define("myModule", function(){ return "test"; });'
+      contents: 'define("myModule", function(){ return "test"; });\n\n'
     }
   ], done);
 });
@@ -81,11 +81,11 @@ it('should emit a dependency', function(done){
   ], [
     {
       path: 'deps/dep1',
-      contents: 'define("deps/dep1", function(){return "dependency1";});'
+      contents: 'define("deps/dep1", function(){return "dependency1";});\n\n'
     },
     {
       path: 'myModule',
-      contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; });'
+      contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; });\n\n'
     }
   ], done);
 });
@@ -102,11 +102,11 @@ it('should emit one file per module', function(done){
   ], [
     {
       path: 'dep1',
-      contents: 'define("dep1", function(){return "dependency1";});'
+      contents: 'define("dep1", function(){return "dependency1";});\n\n'
     },
     {
       path: 'myModule',
-      contents: 'define("myModule", ["dep1"], function(){ return "test"; });'
+      contents: 'define("myModule", ["dep1"], function(){ return "test"; });\n\n'
     }
   ], done);
 });

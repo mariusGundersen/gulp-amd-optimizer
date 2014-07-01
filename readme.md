@@ -18,9 +18,16 @@ var gulp = require('gulp');
 var amdOptimize = require('gulp-amd-optimizer');
 var concat = require('gulp-concat-sourcemap');
 
+var requireConfig = {
+  baseUrl: __dirname
+};
+var options = {
+  umd: false
+};
+
 gulp.task('default', function () {
   return gulp.src('src/*.js')
-    .pipe(amdOptimize())
+    .pipe(amdOptimize(requireConfig, options))
     .pipe(concat('modules.js'))
     .pipe(gulp.dest('dist'));
 });
@@ -33,9 +40,18 @@ gulp-amd-optimizer accepts JS files containing one or more AMD modules. Anonymou
 This plugin does not attempt to concat the files. This is the job of other plugins.
 
 
+### Config
+
+The amdOptimizer method takes the RequireJS configuration as its first argument, as described in the [RequireJS documentation](http://requirejs.org/docs/api.html#config), with some slight differences:
+
+ * `baseUrl`: *string* The path from which modules are loaded. [RequireJS documentation](http://requirejs.org/docs/api.html#config-baseUrl)
+ * `exclude`: *[string]* List of modules NOT to load. 
+
 ### Options
 
-The method takes the requireJS config file as its first argument. Use this to supply the baseUrl, path and other requireJS configurations. You can also supply a list of modules or paths to exclude from the built file. This is useful when you depend on other libraries, like jQuery. 
+The second argument to amdOptimizer is optional and can be used to change the way modules are found and named. It consists of the following options:
+
+ * `umd`: *boolean* When true, try to find umd modules and name them. See https://github.com/umdjs/umd
 
 ### Sourcemap
 
