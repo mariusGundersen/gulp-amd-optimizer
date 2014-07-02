@@ -1,1 +1,1 @@
-(function(){}(typeof define === 'function' && define.amd ? define : null))
+(function(){}(typeof define === 'function' && define['amd'] ? define : null))
