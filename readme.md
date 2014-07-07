@@ -26,7 +26,7 @@ var options = {
 };
 
 gulp.task('default', function () {
-  return gulp.src('src/*.js')
+  return gulp.src('src/*.js', {base: requireConfig.baseUrl})
     .pipe(amdOptimize(requireConfig, options))
     .pipe(concat('modules.js'))
     .pipe(gulp.dest('dist'));
@@ -64,7 +64,7 @@ var concat = require('gulp-concat-sourcemap');
 var sourcemap = require('gulp-sourcemaps');
 
 gulp.task('default', function () {
-  return gulp.src('src/*.js')
+  return gulp.src('src/*.js', {base: 'src'})
     .pipe(sourcemap.init())
       .pipe(amdOptimize({
         baseUrl: 'src',
