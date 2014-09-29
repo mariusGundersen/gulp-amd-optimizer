@@ -4,38 +4,24 @@ var gutil = require('gulp-util');
 var through = require('through');
 var fs = require('fs');
 var path = require('path');
+var slash = require('slash');
 
 var File = gutil.File;
 var Buffer = require('buffer').Buffer;
 var PluginError = gutil.PluginError;
 var baseName = /^(.*?)\.\w+$/;
-var windowsBackslash = /\\/g;
 
-
-function loadFile(path, name){
-  return {
-    name: name,
-    path: path,
-    source: fs.readFileSync(path).toString('utf8')
-  };
+function loadFile(path, name, done){
+  fs.readFile(path, function(err, contents){
+    if(err) return done(err);
+    var file = new File({
+      path: path,
+      contents: contents
+    });
+    file.name = name;
+    done(null, file);
+  })
 }
-
-
-
-function isExcluded(config, name){
-  return config.exclude && config.exclude.some(function(exclude){
-    if(name[exclude.length-1] == '/'){
-      return name.indexOf(exclude) === 0;
-    }else{
-      return name == exclude;
-    }
-  });
-}
-
-
-
-
-
 
 module.exports = function (config, options) {
   
@@ -51,10 +37,7 @@ module.exports = function (config, options) {
   var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
-    if(isExcluded(config, dependency.name)){
-      return;
-    }
-    optimizer.addFile(loadFile(dependency.url, dependency.name))
+    loadFile(dependency.path, dependency.name, optimizer.addFile.bind(optimizer));
   });
   
   function onData(file) {
@@ -72,47 +55,38 @@ module.exports = function (config, options) {
     }
     
     cwd = file.cwd;
+    file.name = baseName.exec(file.relative)[1];
     
-    optimizer.addFile({
-      source: file.contents.toString('utf8'),
-      path: file.path,
-      name: baseName.exec(file.relative.replace(windowsBackslash, "/"))[1]
-    });
+    optimizer.addFile(null, file);
     
   }
   
   function onEnd(){
-    
-    var output = optimizer.optimize();
-            
-    output.forEach(function(module){
-            
-      if(module.code == undefined){
-        if(!isExcluded(config, module.name)){
-          console.warn('missing module', module.name);
+    optimizer.done(function(output){
+      output.forEach(function(module){
+        var file = new File({
+          path: module.name,
+          base: path.join(cwd, config.baseUrl),
+          cwd: cwd,
+          contents: new Buffer(module.content + '\n\n')
+        });
+
+        if(sourceMapSupport){
+          module.map.sourcesContent = [module.source];
+
+          file.sourceMap = module.map;
         }
-        return;
-      }
-      
-      var file = new File({
-        path: module.name,
-        base: path.join(cwd, config.baseUrl),
-        cwd: cwd,
-        contents: new Buffer(module.code+'\n\n')
-      });
-      
-      if(sourceMapSupport){
-        module.map.sourcesContent = [module.source];
-        
-        file.sourceMap = module.map;
-      }
-      
-      this.queue(file);
+        this.queue(file);
+      }.bind(this));
+      this.queue(null);
     }.bind(this));
-    
-    this.queue(null);
-        
   }
   
-  return through(onData, onEnd);
+  var transformer = through(onData, onEnd);
+    
+  optimizer.on('error', function(error){
+    transformer.emit('error', error);
+  });
+  
+  return transformer;
 };
