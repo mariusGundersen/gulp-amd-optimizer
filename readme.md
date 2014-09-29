@@ -45,7 +45,7 @@ This plugin does not attempt to concat the files. This is the job of other plugi
 The amdOptimizer method takes the RequireJS configuration as its first argument, as described in the [RequireJS documentation](http://requirejs.org/docs/api.html#config), with some slight differences:
 
  * `baseUrl`: *string* The path from which modules are loaded. [RequireJS documentation](http://requirejs.org/docs/api.html#config-baseUrl)
- * `exclude`: *[string]* List of modules NOT to load. 
+ * `exclude`: *[string]* List of modules and folders NOT to load. 
 
 ### Options
 
@@ -55,34 +55,39 @@ The second argument to amdOptimizer is optional and can be used to change the wa
 
 ### Sourcemap
 
-gulp-amd-optimzer supports the [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps/) plugin. The example below shows how sourcemaps can be used along with the options 
+gulp-amd-optimzer supports the [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps/) plugin. The example below shows how sourcemaps can be used. 
 
 ```js
 var gulp = require('gulp');
 var amdOptimize = require('gulp-amd-optimizer');
-var concat = require('gulp-concat-sourcemap');
+var concat = require('gulp-concat');
 var sourcemap = require('gulp-sourcemaps');
 
 gulp.task('default', function () {
-  return gulp.src('src/*.js', {base: 'src'})
+  return gulp.src('src/*.js', { base: amdConfig.baseUrl })
     .pipe(sourcemap.init())
-      .pipe(amdOptimize({
-        baseUrl: 'src',
-        path:{
-          'lib': '../lib'
-        }
-        exclude: [
-          'jQuery'
-        ]
-      }))
-      .pipe(concat('modules.js', {
-        sourcesContent: true,
-        prefix: 1
-      }))
-    .pipe(sourcemap.write())
+    .pipe(amdOptimize(amdConfig))
+    .pipe(concat('modules.js'))
+    .pipe(sourcemap.write('./', { includeContent: false, sourceRoot: '../src' }))
     .pipe(gulp.dest('dist'));
 });
+
+var amdConfig = {
+  baseUrl: 'src',
+  path:{
+    'lib': '../lib'
+  }
+  exclude: [
+    'jQuery'
+  ]
+};
 ```
+
+Sourcemaps can be difficult to get right, so it is a good idea to follow these rules:
+
+* The `base` option passed to `gulp.src` should be the same as `baseUrl` in the `amdConfig`.
+* The sourcemap should be written to the same folder (`./`) as the output.
+* The sourceRoot should be the relative path from the  destination folder (the argument to `gulp.dest`) to the `base`. 
 
 ## License
 
