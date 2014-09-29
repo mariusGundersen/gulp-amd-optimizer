@@ -11,7 +11,6 @@ var Buffer = require('buffer').Buffer;
 var PluginError = gutil.PluginError;
 var baseName = /^(.*?)\.\w+$/;
 
-
 function loadFile(path, name, done){
   fs.readFile(path, function(err, contents){
     if(err) return done(err);
@@ -23,23 +22,6 @@ function loadFile(path, name, done){
     done(null, file);
   })
 }
-
-
-
-function isExcluded(config, name){
-  return config.exclude && config.exclude.some(function(exclude){
-    if(name[exclude.length-1] == '/'){
-      return name.indexOf(exclude) === 0;
-    }else{
-      return name == exclude;
-    }
-  });
-}
-
-
-
-
-
 
 module.exports = function (config, options) {
   
@@ -55,10 +37,6 @@ module.exports = function (config, options) {
   var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
-    if(isExcluded(config, dependency.name)){
-      return;
-    }
-    
     loadFile(dependency.path, dependency.name, optimizer.addFile.bind(optimizer));
   });
   
@@ -80,28 +58,12 @@ module.exports = function (config, options) {
     file.name = baseName.exec(file.relative)[1];
     
     optimizer.addFile(null, file);
-    /*{
-      source: file.contents.toString('utf8'),
-      path: file.path,
-      relative: file.relative.replace(windowsBackslash, "/"),
-      name: baseName.exec(file.relative.replace(windowsBackslash, "/"))[1]
-    });*/
     
   }
   
   function onEnd(){
-    
     optimizer.done(function(output){
-
       output.forEach(function(module){
-        
-        if(module.content == undefined){
-          if(!isExcluded(config, module.name)){
-            this.emit('error', 'missing module', module.name);
-          }
-          return;
-        }
-
         var file = new File({
           path: module.name,
           base: path.join(cwd, config.baseUrl),
@@ -114,13 +76,10 @@ module.exports = function (config, options) {
 
           file.sourceMap = module.map;
         }
-
         this.queue(file);
       }.bind(this));
-
       this.queue(null);
     }.bind(this));
-        
   }
   
   var transformer = through(onData, onEnd);
