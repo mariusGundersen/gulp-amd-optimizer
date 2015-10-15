@@ -18,11 +18,11 @@ describe("umd testing", function(){
     ], [
       {
         path: 'deps/umd',
-        contents: "(function(){}(typeof define === 'function' && define['amd'] ? define : null));\n\n"
+        contents: "(function(){}(typeof define === 'function' && define['amd'] ? define : null))\n\n"
       },
       {
         path: 'myModule',
-        contents: 'define("myModule", ["deps/umd"], function(){ return "test"; });\n\n'
+        contents: 'define("myModule", ["deps/umd"], function(){ return "test"; })\n\n'
       }
     ], done);
   });
@@ -41,11 +41,11 @@ describe("umd testing", function(){
     ], [
       {
         path: 'deps/umd',
-        contents: "(function(){}(typeof define === 'function' && define['amd'] ? define.bind(null, \"deps/umd\") : null));\n\n"
+        contents: "(function(){}(typeof define === 'function' && define['amd'] ? define.bind(null, \"deps/umd\") : null))\n\n"
       },
       {
         path: 'myModule',
-        contents: 'define("myModule", ["deps/umd"], function(){ return "test"; });\n\n'
+        contents: 'define("myModule", ["deps/umd"], function(){ return "test"; })\n\n'
       }
     ], done);
   });

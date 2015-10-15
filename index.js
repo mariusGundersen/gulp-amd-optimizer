@@ -37,7 +37,13 @@ module.exports = function (config, options) {
   var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
-    loadFile(dependency.path, dependency.name, optimizer.addFile.bind(optimizer));
+    loadFile(dependency.path, dependency.name, function(err, file){
+      if(err){
+        optimizer.error('Could not load `'+dependency.name+'`\n required by `'+dependency.requiredBy+'`\n from path `'+dependency.path+'`\n because of '+err);
+      }else{
+        optimizer.addFile(file);
+      }
+    });
   });
   
   function onData(file) {
@@ -57,7 +63,7 @@ module.exports = function (config, options) {
     cwd = file.cwd;
     file.name = baseName.exec(file.relative)[1];
     
-    optimizer.addFile(null, file);
+    optimizer.addFile(file);
     
   }
   

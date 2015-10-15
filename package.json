@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mariusGundersen/gulp-amd-optimize"
+    "url": "git://github.com/mariusGundersen/gulp-amd-optimizer"
   },
   "keywords": [
     "gulpplugin",
@@ -19,16 +19,16 @@
   "author": "Marius Gundersen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mariusGundersen/gulp-amd-optimize/issues"
+    "url": "https://github.com/mariusGundersen/gulp-amd-optimizer/issues"
   },
-  "homepage": "https://github.com/mariusGundersen/gulp-amd-optimize",
+  "homepage": "https://github.com/mariusGundersen/gulp-amd-optimizer",
   "dependencies": {
     "gulp-util": "~3.0.6",
-    "amd-optimizer": "~0.3.4",
-    "through": "^2.3.7",
+    "amd-optimizer": "~0.4.0",
+    "through": "^2.3.8",
     "slash": "~1.0.0"
   },
   "devDependencies": {
-    "mocha": "~2.2.5"
+    "mocha": "~2.3.3"
   }
 }

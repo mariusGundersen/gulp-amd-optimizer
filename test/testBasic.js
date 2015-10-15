@@ -14,7 +14,7 @@ describe("basic testing", function(){
     ], [
       {
         path: 'myModule',
-        contents: 'define("myModule", function(){ return "test"; });\n\n'
+        contents: 'define("myModule", function(){ return "test"; })\n\n'
       }
     ], done);
   });
@@ -31,7 +31,7 @@ describe("basic testing", function(){
     ], [
       {
         path: 'myModule',
-        contents: 'define("myModule", function(){ return "test"; });\n\n'
+        contents: 'define("myModule", function(){ return "test"; })\n\n'
       }
     ], done);
   });
@@ -51,7 +51,7 @@ describe("basic testing", function(){
       },
       {
         path: 'myModule',
-        contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; });\n\n'
+        contents: 'define("myModule", ["deps/dep1"], function(){ return "test"; })\n\n'
       }
     ], done);
   });
