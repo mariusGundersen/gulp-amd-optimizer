@@ -24,16 +24,18 @@ function loadFile(path, name, done){
 }
 
 module.exports = function (config, options) {
-  
-  if(config == undefined || 'baseUrl' in config == false){
+
+  if(!config || typeof config !== 'object'){
+    throw new PluginError('gulp-amd-optimize', 'first argument, the config, must be an object');
+  }else if('baseUrl' in config === false){
     throw new PluginError('gulp-amd-optimize', 'baseUrl is required in the config');
   }
-  
+
   options = options || {};
-  
+
   var sourceMapSupport = false;
   var cwd;
-  
+
   var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
@@ -45,12 +47,12 @@ module.exports = function (config, options) {
       }
     });
   });
-  
+
   function onData(file) {
     if (file.isNull()) {
       this.push(file);
     }
-    
+
     if(file.sourceMap){
       sourceMapSupport = true;
     }
@@ -59,14 +61,14 @@ module.exports = function (config, options) {
       this.emit('error', new PluginError('gulp-amd-optimize', 'Streaming not supported'));
       return
     }
-    
+
     cwd = file.cwd;
     file.name = baseName.exec(file.relative)[1];
-    
+
     optimizer.addFile(file);
-    
+
   }
-  
+
   function onEnd(){
     optimizer.done(function(output){
       output.forEach(function(module){
@@ -87,12 +89,12 @@ module.exports = function (config, options) {
       this.queue(null);
     }.bind(this));
   }
-  
+
   var transformer = through(onData, onEnd);
-    
+
   optimizer.on('error', function(error){
     transformer.emit('error', error);
   });
-  
+
   return transformer;
 };
