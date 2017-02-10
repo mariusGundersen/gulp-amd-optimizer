@@ -11,11 +11,12 @@ var Buffer = require('buffer').Buffer;
 var PluginError = gutil.PluginError;
 var baseName = /^(.*?)\.\w+$/;
 
-function loadFile(path, name, done){
+function loadFile(path, name, baseUrl, done){
   fs.readFile(path, function(err, contents){
     if(err) return done(err);
     var file = new File({
       path: path,
+      base: baseUrl,
       contents: contents
     });
     file.name = name;
@@ -39,7 +40,7 @@ module.exports = function (config, options) {
   var optimizer = optimize(config, options);
 
   optimizer.on('dependency', function(dependency){
-    loadFile(dependency.path, dependency.name, function(err, file){
+    loadFile(dependency.path, dependency.name, config.baseUrl, function(err, file){
       if(err){
         optimizer.error('Could not load `'+dependency.name+'`\n required by `'+dependency.requiredBy+'`\n from path `'+dependency.path+'`\n because of '+err);
       }else{
@@ -62,7 +63,7 @@ module.exports = function (config, options) {
       return
     }
 
-    cwd = file.cwd;
+    cwd = cwd || file.cwd;
     file.name = baseName.exec(file.relative)[1];
 
     optimizer.addFile(file);
@@ -73,11 +74,13 @@ module.exports = function (config, options) {
     optimizer.done(function(output){
       output.forEach(function(module){
         var file = new File({
-          path: module.name,
-          base: path.join(cwd, config.baseUrl),
+          path: path.join(config.baseUrl, module.file.relative),
+          base: config.baseUrl,
           cwd: cwd,
           contents: new Buffer(module.content + '\n\n')
         });
+
+        file.name = module.name;
 
         if(sourceMapSupport){
           module.map.sourcesContent = [module.source];

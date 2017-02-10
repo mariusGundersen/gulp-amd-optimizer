@@ -7,13 +7,13 @@ var fs = require('fs');
 module.exports = function configInputOutputDone(options, input, output, done){
 
   var stream = amdOptimize({
-    baseUrl: __dirname+'/..'
+    baseUrl: path.join(__dirname, '..')
   }, options);
 
   stream.on('data', function(file){
 
     var expected = output.shift();
-    assert.equal(file.path, expected.path);
+    assert.equal(file.name, expected.path);
     assert.equal(file.contents.toString(), expected.contents);
   });
 
@@ -25,7 +25,8 @@ module.exports = function configInputOutputDone(options, input, output, done){
 
   input.forEach(function(file){
     stream.write(new gutil.File({
-      path: file.path,
+      path: path.join(__dirname, '../deps', file.path),
+      base: path.join(__dirname, '../deps'),
       contents: new Buffer(file.contents)
     }));
   });
